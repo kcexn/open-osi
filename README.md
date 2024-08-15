@@ -12,7 +12,7 @@ open-osi provides templates and abstractions to encapsulate layers 5 and 6 of th
 
 These layers are often neglected by libraries that provide some sort of user functionality. For instance, [libcurl](https://github.com/curl/curl),
 and [zeromq](https://zeromq.org/) are both robust, and highly capable libraries that are useful for building applications that need an HTTP client or a messaging service
-respectively; however, their API's make it very difficult to integrate these libraries with an application that wants to have complete control over how I/O is performed.
+respectively; however, their APIs make it very difficult to integrate these libraries with applications that want complete control over how I/O is performed.
 Critically, the problem is that these libraries spill out over layers 5 and 6 of the OSI networking model, this means that a communication protocol like HTTP/1.1 or ZMTP
 can't be easily separated from the rest of the library. While this is convenient for developers who just need to get something working, if we have found ourselves in a
 situation where we are using, or are considering the use of C++ for development, then it is very likely we are in a situation where *performance* is critical.
