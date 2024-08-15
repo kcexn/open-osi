@@ -23,7 +23,10 @@ namespace unix_session
             uSession(boost::asio::local::stream_protocol::socket&& socket, session::Server& server): session::Session(server),_socket(std::move(socket)) {}
 
             void read() override;
+            void async_read();
+
             void write() override;
+            void async_write();
 
             ~uSession() = default;
         private:
@@ -46,7 +49,7 @@ namespace unix_session
 
             void accept(std::function<void(const std::error_code& ec, std::shared_ptr<uSession> session)> fn);
 
-            virtual ~uServer() = default;
+            ~uServer();
         private:
             boost::asio::io_context& _ioc;
             boost::asio::local::stream_protocol::endpoint _endpoint;

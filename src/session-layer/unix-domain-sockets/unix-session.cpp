@@ -4,6 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 #include <string_view>
+#include <filesystem>
 #include "unix-session.hpp"
 namespace unix_session
 {
@@ -13,25 +14,52 @@ namespace unix_session
         std::array<char, PAGE> buf;
         boost::system::error_code ec;
         do{
-            std::size_t len = _socket.read_some(boost::asio::mutable_buffer(buf.data(), buf.size()), ec);
+            std::size_t len = _socket.read_some(boost::asio::mutable_buffer(buf.data(), PAGE), ec);
             if(!ec){
-                std::unique_lock<std::mutex> lk = lock();
+                auto lk = lock();
                 std::string_view s(buf.data(), len);
                 rbuf << s;
             }
         } while(!ec);
     }
 
+    void uSession::async_read(){
+        _socket.async_wait(
+            boost::asio::local::stream_protocol::socket::wait_type::wait_read,
+            [&](const boost::system::error_code& ec){
+                if(!ec){
+                    read();
+                }
+            }
+        );
+    }
+
     void uSession::write(){
-        std::unique_lock<std::mutex> lk = lock();
-        std::string buf(wbuf.str());
-        wbuf.str(std::string());
+        std::array<char, PAGE> buf;
         boost::system::error_code ec;
-        boost::asio::const_buffer out(buf.data(), buf.size());
-        do{
-            std::size_t len = _socket.write_some(out, ec);
-            out += len;
-        }while(out.size() > 0);
+        auto lk = lock();
+        auto rlen = wbuf.readsome(buf.data(), PAGE);
+        while(rlen > 0){
+            boost::asio::const_buffer out(buf.data(), rlen);
+            do{
+                std::size_t len = _socket.write_some(out, ec);
+                out += len;
+            }while(out.size() > 0 && !ec);
+            if(!ec){
+                rlen = wbuf.readsome(buf.data(), PAGE);
+            }
+        }
+    }
+
+    void uSession::async_write(){
+        _socket.async_wait(
+            boost::asio::local::stream_protocol::socket::wait_type::wait_write,
+            [&](const boost::system::error_code& ec){
+                if(!ec){
+                    write();
+                }
+            }
+        );
     }
 
     void uServer::open(const boost::asio::local::stream_protocol::endpoint& endpoint){
@@ -40,7 +68,7 @@ namespace unix_session
         socket.connect(endpoint);
         std::shared_ptr<uSession> session = std::make_shared<uSession>(std::move(socket), *this);
         {
-            std::unique_lock<std::mutex> lk = lock();
+            auto lk = lock();
             push_back(session);
         }
     }
@@ -52,7 +80,7 @@ namespace unix_session
                 socket.non_blocking(true);
                 std::shared_ptr<uSession> session = std::make_shared<uSession>(std::move(socket), *this);
                 {
-                    std::unique_lock<std::mutex> lk = lock();
+                    auto lk = lock();
                     push_back(session);
                 }
                 std::error_code errc(ec.value(), std::system_category());
@@ -60,5 +88,12 @@ namespace unix_session
                 accept(fn);
             }
         });
+    }
+
+    uServer::~uServer(){
+        if(_endpoint != boost::asio::local::stream_protocol::endpoint()){
+            std::filesystem::path p(_endpoint.path());
+            std::filesystem::remove(p);
+        }
     }
 }
