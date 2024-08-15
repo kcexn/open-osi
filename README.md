@@ -44,7 +44,7 @@ socket()
 connect()
 ```
 both of which will leave you with a file descriptor that represents a connected TCP session. If you are a developer working with a more exotic transport protocol like SCTP, 
-or perhaps you are working in an environment you are using raw sockets. Then the Berkeley sockets API may be cumbersome to work with, and a more sophisticated layer 5 
+or perhaps you are working in an environment that is using raw sockets. Then the Berkeley sockets API may be cumbersome to work with, and a more sophisticated layer 5 
 abstraction is needed.
 
 ### 5+6+7
