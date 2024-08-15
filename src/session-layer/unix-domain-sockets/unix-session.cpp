@@ -48,8 +48,8 @@ namespace unix_session
     void uServer::accept(std::function<void(const std::error_code& ec, std::shared_ptr<uSession> session)> fn){
         _acceptor.async_accept([&, fn](const boost::system::error_code& ec, boost::asio::local::stream_protocol::socket socket){
             if(!ec){
-                std::shared_ptr<uSession> session = std::make_shared<uSession>(std::move(socket), *this);
                 socket.non_blocking(true);
+                std::shared_ptr<uSession> session = std::make_shared<uSession>(std::move(socket), *this);
                 {
                     std::unique_lock<std::mutex> lk = lock();
                     push_back(session);
