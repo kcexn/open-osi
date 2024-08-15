@@ -38,7 +38,8 @@ namespace unix_session
     class uServer: public session::Server
     {
         public:
-            uServer(boost::asio::io_context& ioc, const boost::asio::local::stream_protocol::endpoint& endpoint): _ioc(ioc), _endpoint(endpoint), _acceptor(ioc) {}
+            uServer(boost::asio::io_context& ioc): _ioc(ioc), _acceptor(ioc) {}
+            uServer(boost::asio::io_context& ioc, const boost::asio::local::stream_protocol::endpoint& endpoint): _ioc(ioc), _endpoint(endpoint), _acceptor(ioc, endpoint) {}
 
             void open(const boost::asio::local::stream_protocol::endpoint& endpoint);
             void open() override;

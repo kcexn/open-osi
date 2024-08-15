@@ -43,10 +43,7 @@ namespace unix_session
             push_back(session);
         }
     }
-    void uServer::open(){
-        std::unique_lock<std::mutex> lk = lock();
-        _acceptor.open();
-    }
+    void uServer::open(){}
 
     void uServer::accept(std::function<void(const std::error_code& ec, std::shared_ptr<uSession> session)> fn){
         _acceptor.async_accept([&, fn](const boost::system::error_code& ec, boost::asio::local::stream_protocol::socket socket){
