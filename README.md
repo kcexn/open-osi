@@ -55,5 +55,9 @@ layer may also use many different transport protocols: TCP, UDP, SCTP, RTP etc.,
 ### < 5
 open-osi assumes that the operating system and computer hardware will manage all of the layers below layer 5: Transport, Network, Data-link, and Physical.
 
+## Protocols Supported
+- Unix Domain Sockets
+
+
 ## Dependencies:
 [boost/asio](https://www.boost.org/doc/libs/1_86_0/doc/html/boost_asio.html)
