@@ -25,6 +25,7 @@ namespace unix_session
     void uSession::write(){
         std::unique_lock<std::mutex> lk = lock();
         std::string buf(wbuf.str());
+        wbuf.str(std::string());
         boost::system::error_code ec;
         boost::asio::const_buffer out(buf.data(), buf.size());
         do{
