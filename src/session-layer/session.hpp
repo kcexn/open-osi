@@ -52,7 +52,7 @@ namespace session
 
             virtual void open()=0;
             void close(const std::shared_ptr<Session>& sp){
-                std::unique_lock<std::mutex> lk(std::move(lock()));
+                auto lk = lock();
                 auto it = std::find(this->cbegin(), this->cend(), sp);
                 if(it != this->cend()){
                     this->erase(it);
