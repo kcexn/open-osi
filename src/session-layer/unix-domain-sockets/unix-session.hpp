@@ -43,6 +43,7 @@ namespace unix_session
     {
         typedef boost::asio::local::stream_protocol::endpoint endpoint;
         typedef boost::asio::local::stream_protocol::acceptor acceptor;
+        typedef boost::asio::local::stream_protocol::socket socket;
 
         boost::asio::io_context& _ioc;
         endpoint _endpoint;

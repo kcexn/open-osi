@@ -25,7 +25,7 @@ namespace unix_session
 
     void uSession::async_read(std::function<void(std::error_code ec)> cb){
         _socket.async_wait(
-            boost::asio::local::stream_protocol::socket::wait_type::wait_read,
+            uSession::socket::wait_type::wait_read,
             [&](const boost::system::error_code& ec){
                 if(!ec){
                     read();
@@ -54,7 +54,7 @@ namespace unix_session
 
     void uSession::async_write(std::function<void(std::error_code ec)> cb){
         _socket.async_wait(
-            boost::asio::local::stream_protocol::socket::wait_type::wait_write,
+            uSession::socket::wait_type::wait_write,
             [&](const boost::system::error_code& ec){
                 if(!ec){
                     write();
@@ -64,8 +64,8 @@ namespace unix_session
         );
     }
 
-    void uServer::open(const boost::asio::local::stream_protocol::endpoint& endpoint){
-        boost::asio::local::stream_protocol::socket socket(_ioc);
+    void uServer::open(const uServer::endpoint& endpoint){
+        uServer::socket socket(_ioc);
         socket.non_blocking(true);
         socket.connect(endpoint);
         std::shared_ptr<uSession> session = std::make_shared<uSession>(std::move(socket), *this);
@@ -77,7 +77,7 @@ namespace unix_session
     void uServer::open(){}
 
     void uServer::accept(std::function<void(const std::error_code& ec, std::shared_ptr<uSession> session)> fn){
-        _acceptor.async_accept([&, fn](const boost::system::error_code& ec, boost::asio::local::stream_protocol::socket socket){
+        _acceptor.async_accept([&, fn](const boost::system::error_code& ec, uServer::socket socket){
             if(!ec){
                 socket.non_blocking(true);
                 std::shared_ptr<uSession> session = std::make_shared<uSession>(std::move(socket), *this);
@@ -93,7 +93,7 @@ namespace unix_session
     }
 
     uServer::~uServer(){
-        if(_endpoint != boost::asio::local::stream_protocol::endpoint()){
+        if(_endpoint != uServer::endpoint()){
             std::filesystem::path p(_endpoint.path());
             std::filesystem::remove(p);
         }
