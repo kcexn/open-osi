@@ -31,7 +31,9 @@ namespace session
             Session(Server& server): _server(server), rbuf(), wbuf(){}
 
             virtual void read()=0;
+            virtual void async_read(std::function<void(std::error_code ec)> cb)=0;
             virtual void write()=0;
+            virtual void async_write(std::function<void(std::error_code ec)> cb)=0;
             
             std::unique_lock<std::mutex> lock() { return std::unique_lock<std::mutex>(_mtx); }
             std::stringstream rbuf;
@@ -48,7 +50,7 @@ namespace session
     class Server: public std::vector<std::shared_ptr<Session> >
     {
         std::mutex _mtx;
-        
+
         public:
             Server(){}
 

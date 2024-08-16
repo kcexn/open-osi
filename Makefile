@@ -11,9 +11,9 @@ CXX_FLAGS = -I$(INCLUDE_DIR) \
 			-Wall \
 			-Wextra
 LD_FLAGS = -L/workspaces/open-osi/lib/boost/lib/ -lboost_system -lpthread
-VPATH = src:objects:src/session-layer:src/session-layer/unix-domain-sockets
+VPATH = src:objects:src/session-layer:src/session-layer/unix-domain-sockets:src/presentation-layer/http-presentation
 
-OBJECTS = unix-session
+OBJECTS = unix-session http-presentation http-requests
 TARGET = open-osi
 
 # DEBUG SETTINGS

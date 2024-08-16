@@ -56,7 +56,11 @@ layer may also use many different transport protocols: TCP, UDP, SCTP, RTP etc.,
 open-osi assumes that the operating system and computer hardware will manage all of the layers below layer 5: Transport, Network, Data-link, and Physical.
 
 ## Protocols Supported
+### Session Layer
 - Unix Domain Sockets
+
+### Presentation Layer
+- HTTP/1.1
 
 
 ## Dependencies:

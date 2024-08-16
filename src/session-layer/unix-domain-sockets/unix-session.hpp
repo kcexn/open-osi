@@ -26,10 +26,10 @@ namespace unix_session
             uSession(socket&& socket, session::Server& server): session::Session(server), _socket(std::move(socket)) {}
 
             void read() override;
-            void async_read(std::function<void(std::error_code ec)> cb);
+            void async_read(std::function<void(std::error_code ec)> cb) override;
 
             void write() override;
-            void async_write(std::function<void(std::error_code ec)> cb);
+            void async_write(std::function<void(std::error_code ec)> cb) override;
 
             ~uSession() = default;
     };
