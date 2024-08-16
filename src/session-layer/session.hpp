@@ -24,8 +24,11 @@ namespace session
     */
     class Session: public std::enable_shared_from_this<Session>
     {
+        Server& _server;
+        std::mutex _mtx;
+
         public:
-            Session(Server& server): rbuf(), wbuf(), _server(server){}
+            Session(Server& server): _server(server), rbuf(), wbuf(){}
 
             virtual void read()=0;
             virtual void write()=0;
@@ -34,10 +37,7 @@ namespace session
             std::stringstream rbuf;
             std::stringstream wbuf;
 
-            virtual ~Session() = default;
-        private:
-            Server& _server;
-            std::mutex _mtx;
+            virtual ~Session() = default;            
     };
 
     /*
@@ -47,6 +47,8 @@ namespace session
     */
     class Server: public std::vector<std::shared_ptr<Session> >
     {
+        std::mutex _mtx;
+        
         public:
             Server(){}
 
@@ -60,9 +62,7 @@ namespace session
             }
             std::unique_lock<std::mutex> lock() { return std::unique_lock<std::mutex>(_mtx); }
 
-            virtual ~Server() = default;
-        private:
-            std::mutex _mtx;
+            virtual ~Server() = default;           
     };
 }
 #endif

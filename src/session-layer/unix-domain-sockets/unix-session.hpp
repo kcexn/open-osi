@@ -19,8 +19,11 @@ namespace unix_session
     */
     class uSession: public session::Session
     {
+        typedef boost::asio::local::stream_protocol::socket socket;
+        socket _socket;
+        
         public:
-            uSession(boost::asio::local::stream_protocol::socket&& socket, session::Server& server): session::Session(server),_socket(std::move(socket)) {}
+            uSession(socket&& socket, session::Server& server): session::Session(server), _socket(std::move(socket)) {}
 
             void read() override;
             void async_read(std::function<void(std::error_code ec)> cb);
@@ -29,8 +32,6 @@ namespace unix_session
             void async_write(std::function<void(std::error_code ec)> cb);
 
             ~uSession() = default;
-        private:
-            boost::asio::local::stream_protocol::socket _socket;
     };
 
     /*
@@ -40,20 +41,23 @@ namespace unix_session
     */
     class uServer: public session::Server
     {
+        typedef boost::asio::local::stream_protocol::endpoint endpoint;
+        typedef boost::asio::local::stream_protocol::acceptor acceptor;
+
+        boost::asio::io_context& _ioc;
+        endpoint _endpoint;
+        acceptor _acceptor;
+
         public:
             uServer(boost::asio::io_context& ioc): _ioc(ioc), _acceptor(ioc) {}
-            uServer(boost::asio::io_context& ioc, const boost::asio::local::stream_protocol::endpoint& endpoint): _ioc(ioc), _endpoint(endpoint), _acceptor(ioc, endpoint) {}
+            uServer(boost::asio::io_context& ioc, const endpoint& endpoint): _ioc(ioc), _endpoint(endpoint), _acceptor(ioc, endpoint) {}
 
-            void open(const boost::asio::local::stream_protocol::endpoint& endpoint);
+            void open(const endpoint& endpoint);
             void open() override;
 
             void accept(std::function<void(const std::error_code& ec, std::shared_ptr<uSession> session)> fn);
 
-            ~uServer();
-        private:
-            boost::asio::io_context& _ioc;
-            boost::asio::local::stream_protocol::endpoint _endpoint;
-            boost::asio::local::stream_protocol::acceptor _acceptor;
+            ~uServer();           
     };
 }
 #endif
