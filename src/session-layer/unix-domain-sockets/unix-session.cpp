@@ -23,12 +23,13 @@ namespace unix_session
         } while(!ec);
     }
 
-    void uSession::async_read(){
+    void uSession::async_read(std::function<void(std::error_code ec)> cb){
         _socket.async_wait(
             boost::asio::local::stream_protocol::socket::wait_type::wait_read,
             [&](const boost::system::error_code& ec){
                 if(!ec){
                     read();
+                    cb(std::error_code(ec.value(), std::system_category()));
                 }
             }
         );
@@ -51,12 +52,13 @@ namespace unix_session
         }
     }
 
-    void uSession::async_write(){
+    void uSession::async_write(std::function<void(std::error_code ec)> cb){
         _socket.async_wait(
             boost::asio::local::stream_protocol::socket::wait_type::wait_write,
             [&](const boost::system::error_code& ec){
                 if(!ec){
                     write();
+                    cb(std::error_code(ec.value(), std::system_category()));
                 }
             }
         );
